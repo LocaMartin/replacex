@@ -131,13 +131,13 @@ func printUsage(w io.Writer) {
 		reset = "\033[0m"
 		bold  = "\033[1m"
 		cyan  = "\033[36m"
-		gray  = "\033[90m"
 		green = "\033[32m"
+		yellow = "\033[33m"
 	)
 
-	fmt.Fprintf(w, "%sreplacex%s %s%s%s\n\n", bold, reset, gray, version, reset)
+	fmt.Fprintf(w, "%sreplacex%s %s%s%s\n\n", bold, reset, green, version, reset)
 	fmt.Fprintf(w, "%sUsage:%s\n", bold, reset)
-	fmt.Fprintf(w, "  cat urls.txt | replacex %spayload%s [%sflags%s]\n\n", green, reset, cyan, reset)
+	fmt.Fprintf(w, "  %scat%s urls.txt %s|%s %sreplacex%s payload [%sflags%s]\n\n", cyan, reset, cyan, reset, cyan, reset, green, reset,)
 	fmt.Fprintf(w, "%sFlags:%s\n", bold, reset)
 
 	rows := [][2]string{
@@ -152,7 +152,7 @@ func printUsage(w io.Writer) {
 	}
 
 	for _, row := range rows {
-		fmt.Fprintf(w, "  %s%-12s%s %s%s%s\n", cyan, row[0], reset, gray, row[1], reset)
+		fmt.Fprintf(w, "  %s%-12s%s %s%s%s\n", green, row[0], reset, yellow, row[1], reset)
 	}
 }
 
@@ -170,6 +170,8 @@ func normalizeBoolFlags(args []string) []string {
 		"--ignore-path": true,
 		"-version":      true,
 		"--version":     true,
+		"-h":             true,
+		"--help":          true,
 	}
 
 	normalized := []string{args[0]}

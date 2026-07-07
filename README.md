@@ -1,8 +1,11 @@
+
+<div align="center">
 <div align="right">
   <img src="https://img.shields.io/badge/Go-1.20-00ADD8?style=plastic&logo=go" alt="Go Version">
 </div>
-
-<h1 align="center">replacex</h1>
+<h1>replacex</h1>
+<p>v0.1.4</p>
+</div>
 
 An enhanced version of `qsreplace`. **replacex** accepts URLs via stdin to quickly replace or append query string values. Payload file mode runs every payload against every input URL. Use `-u` when you want to dedupe input before output. It also features text replacement utilities.
 
@@ -14,6 +17,21 @@ go install github.com/locamartin/replacex@latest
 
 Or [download a release](https://github.com/locamartin/replacex/releases) and put it somewhere in your `$PATH`
 (e.g. in /usr/local/bin).
+
+### Flags
+
+
+
+```yml
+-a:            Append the value instead of replacing it
+-ra:           Output replaced and appended values
+-u:            Only output unique host, path, and parameter combinations
+-ip:           Ignore the path when considering what constitutes a duplicate
+-rw: <string>  Word to replace in stdin
+-ww: <string>  Word to replace -rw with
+-version:      Print version and exit
+-h:            Show this help message
+```
 
 <h3 align="center"><u>Usage</u></h3>
 
