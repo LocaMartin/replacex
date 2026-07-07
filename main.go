@@ -17,6 +17,9 @@ func main() {
 	var replaceAppendMode bool
 	flag.BoolVar(&replaceAppendMode, "ra", false, "Output replaced and appended values")
 
+	var uniqueMode bool
+	flag.BoolVar(&uniqueMode, "u", false, "Only output unique host, path, and parameter combinations")
+
 	var ignorePath bool
 	flag.BoolVar(&ignorePath, "ignore-path", false, "Ignore the path when considering what constitutes a duplicate")
 
@@ -81,12 +84,18 @@ func main() {
 			key = fmt.Sprintf("%s?%s", u.Hostname(), strings.Join(pp, "&"))
 		}
 
-		if !payloadFromFile {
+		if uniqueMode || !payloadFromFile {
 			// Only output each host + path + params combination once.
 			if _, exists := seen[key]; exists {
 				continue
 			}
 			seen[key] = true
+		}
+
+		if uniqueMode && flag.NArg() == 0 && !appendMode && !replaceAppendMode {
+			replaceQueryValues(u, "", true)
+			fmt.Printf("%s\n", u)
+			continue
 		}
 
 		writeURLVariants(u, values, payloadFromFile, appendMode, replaceAppendMode)

@@ -4,7 +4,7 @@
 
 <h1 align="center">replacex</h1>
 
-An enhanced version of `qsreplace`. **replacex** accepts URLs via stdin to quickly replace or append query string values. Literal payload mode deduplicates unique parameter combinations per host and path, while payload file mode runs every payload against every input URL. It also features text replacement utilities.
+An enhanced version of `qsreplace`. **replacex** accepts URLs via stdin to quickly replace or append query string values. Literal payload mode deduplicates unique parameter combinations per host and path, while payload file mode runs every payload against every input URL. Use `-u` when you want to dedupe input before output. It also features text replacement utilities.
 
 ### Install
 
@@ -54,13 +54,18 @@ https://example.net/a/path?one=1newvsfsal&two=2newggfval
 ```
 
 ### Remove Duplicate URL and Parameter Combinations
-Omit the argument to `-a` (append) to only output each combination of URL and query string parameters once:
+Use `-u` to only output each combination of URL and query string parameters once:
 
 ```yml
--$ cat urls.txt | replacex -a 
+-$ cat urls.txt | replacex -u
 https://example.com/path?one=1&two=2
 https://example.com/pathtwo?one=1&two=2
 https://example.net/a/path?one=1&two=2
+```
+
+```yml
+# Dedupe input before applying every payload from a file
+-$ cat urls.txt | replacex -u payloads.txt
 ```
 
 ### Replace and append with one flag `-ra` (replace and append at the same time)
