@@ -26,9 +26,6 @@ func main() {
 	var withWord string
 	flag.StringVar(&withWord, "ww", "", "Word to replace -rw with")
 
-	var payloadFile string
-	flag.StringVar(&payloadFile, "f", "", "Read replacement values from a file")
-
 	flag.Parse()
 
 	visitedFlags := map[string]bool{}
@@ -46,21 +43,23 @@ func main() {
 	}
 
 	values := []string{flag.Arg(0)}
-	if payloadFile != "" {
-		payloads, err := readPayloads(payloadFile)
+	payloadFromFile := false
+	if arg := flag.Arg(0); arg != "" && fileExists(arg) {
+		payloads, err := readPayloads(arg)
 		if err != nil {
-			fmt.Fprintf(os.Stderr, "failed to read payload file %s [%s]\n", payloadFile, err)
+			fmt.Fprintf(os.Stderr, "failed to read payload file %s [%s]\n", arg, err)
 			os.Exit(1)
 		}
 		values = payloads
+		payloadFromFile = true
 	}
 
 	seen := make(map[string]bool)
-	valueIndex := 0
 
 	// read URLs on stdin, then replace the values in the query string
 	// with some user-provided value
 	sc := bufio.NewScanner(os.Stdin)
+	sc.Buffer(make([]byte, 1024), 1024*1024*10)
 	for sc.Scan() {
 		u, err := url.Parse(sc.Text())
 		if err != nil {
@@ -82,33 +81,15 @@ func main() {
 			key = fmt.Sprintf("%s?%s", u.Hostname(), strings.Join(pp, "&"))
 		}
 
-		// Only output each host + path + params combination once
-		if _, exists := seen[key]; exists {
-			continue
-		}
-		seen[key] = true
-
-		value := ""
-		if len(values) > 0 {
-			value = values[valueIndex]
-			if payloadFile != "" && valueIndex < len(values)-1 {
-				valueIndex++
+		if !payloadFromFile {
+			// Only output each host + path + params combination once.
+			if _, exists := seen[key]; exists {
+				continue
 			}
+			seen[key] = true
 		}
 
-		if replaceAppendMode {
-			replaced := *u
-			replaceQueryValues(&replaced, value, false)
-			fmt.Printf("%s\n", &replaced)
-
-			appended := *u
-			replaceQueryValues(&appended, value, true)
-			fmt.Printf("%s\n", &appended)
-			continue
-		}
-
-		replaceQueryValues(u, value, appendMode)
-		fmt.Printf("%s\n", u)
+		writeURLVariants(u, values, payloadFromFile, appendMode, replaceAppendMode)
 
 	}
 	if err := sc.Err(); err != nil {
@@ -129,6 +110,11 @@ func replaceWords(old, new string) {
 	}
 }
 
+func fileExists(name string) bool {
+	info, err := os.Stat(name)
+	return err == nil && !info.IsDir()
+}
+
 func readPayloads(name string) ([]string, error) {
 	f, err := os.Open(name)
 	if err != nil {
@@ -146,6 +132,38 @@ func readPayloads(name string) ([]string, error) {
 	}
 
 	return payloads, nil
+}
+
+func writeURLVariants(u *url.URL, values []string, allValues bool, appendMode bool, replaceAppendMode bool) {
+	if allValues {
+		for _, value := range values {
+			writeURLVariant(u, value, appendMode, replaceAppendMode)
+		}
+		return
+	}
+
+	value := ""
+	if len(values) > 0 {
+		value = values[0]
+	}
+	writeURLVariant(u, value, appendMode, replaceAppendMode)
+}
+
+func writeURLVariant(u *url.URL, value string, appendMode bool, replaceAppendMode bool) {
+	if replaceAppendMode {
+		replaced := *u
+		replaceQueryValues(&replaced, value, false)
+		fmt.Printf("%s\n", &replaced)
+
+		appended := *u
+		replaceQueryValues(&appended, value, true)
+		fmt.Printf("%s\n", &appended)
+		return
+	}
+
+	updated := *u
+	replaceQueryValues(&updated, value, appendMode)
+	fmt.Printf("%s\n", &updated)
 }
 
 func replaceQueryValues(u *url.URL, value string, appendMode bool) {
