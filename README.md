@@ -76,6 +76,18 @@ https://example.net/a/path?one=1&two=2
 -$ cat urls.txt | replacex -ra payloads.txt -u
 ```
 
+### Ignore Path While Deduping
+
+```yml
+-$ cat urls.txt | replacex -u -ip
+```
+
+### Version
+
+```yml
+replacex -version
+```
+
 ### Replace and append with one flag `-ra` (replace and append at the same time)
 
 ```yml

@@ -4,14 +4,21 @@ import (
 	"bufio"
 	"flag"
 	"fmt"
+	"io"
 	"net/url"
 	"os"
 	"sort"
 	"strings"
 )
 
+const version = "v0.1.4"
+
 func main() {
 	os.Args = normalizeBoolFlags(os.Args)
+
+	flag.Usage = func() {
+		printUsage(flag.CommandLine.Output())
+	}
 
 	var appendMode bool
 	flag.BoolVar(&appendMode, "a", false, "Append the value instead of replacing it")
@@ -23,7 +30,11 @@ func main() {
 	flag.BoolVar(&uniqueMode, "u", false, "Only output unique host, path, and parameter combinations")
 
 	var ignorePath bool
+	flag.BoolVar(&ignorePath, "ip", false, "Ignore the path when considering what constitutes a duplicate")
 	flag.BoolVar(&ignorePath, "ignore-path", false, "Ignore the path when considering what constitutes a duplicate")
+
+	var versionMode bool
+	flag.BoolVar(&versionMode, "version", false, "Print version and exit")
 
 	var replaceWord string
 	flag.StringVar(&replaceWord, "rw", "", "Word to replace in stdin")
@@ -32,6 +43,11 @@ func main() {
 	flag.StringVar(&withWord, "ww", "", "Word to replace -rw with")
 
 	flag.Parse()
+
+	if versionMode {
+		fmt.Println(version)
+		return
+	}
 
 	visitedFlags := map[string]bool{}
 	flag.Visit(func(f *flag.Flag) {
@@ -110,6 +126,36 @@ func main() {
 
 }
 
+func printUsage(w io.Writer) {
+	const (
+		reset = "\033[0m"
+		bold  = "\033[1m"
+		cyan  = "\033[36m"
+		gray  = "\033[90m"
+		green = "\033[32m"
+	)
+
+	fmt.Fprintf(w, "%sreplacex%s %s%s%s\n\n", bold, reset, gray, version, reset)
+	fmt.Fprintf(w, "%sUsage:%s\n", bold, reset)
+	fmt.Fprintf(w, "  cat urls.txt | replacex %spayload%s [%sflags%s]\n\n", green, reset, cyan, reset)
+	fmt.Fprintf(w, "%sFlags:%s\n", bold, reset)
+
+	rows := [][2]string{
+		{"-a", "Append the value instead of replacing it"},
+		{"-ra", "Output replaced and appended values"},
+		{"-u", "Only output unique host, path, and parameter combinations"},
+		{"-ip", "Ignore the path when considering what constitutes a duplicate"},
+		{"-rw string", "Word to replace in stdin"},
+		{"-ww string", "Word to replace -rw with"},
+		{"-version", "Print version and exit"},
+		{"-h", "Show this help message"},
+	}
+
+	for _, row := range rows {
+		fmt.Fprintf(w, "  %s%-12s%s %s%s%s\n", cyan, row[0], reset, gray, row[1], reset)
+	}
+}
+
 func normalizeBoolFlags(args []string) []string {
 	boolFlags := map[string]bool{
 		"-a":            true,
@@ -118,8 +164,12 @@ func normalizeBoolFlags(args []string) []string {
 		"--ra":          true,
 		"-u":            true,
 		"--u":           true,
+		"-ip":           true,
+		"--ip":          true,
 		"-ignore-path":  true,
 		"--ignore-path": true,
+		"-version":      true,
+		"--version":     true,
 	}
 
 	normalized := []string{args[0]}
