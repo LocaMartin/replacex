@@ -11,6 +11,8 @@ import (
 )
 
 func main() {
+	os.Args = normalizeBoolFlags(os.Args)
+
 	var appendMode bool
 	flag.BoolVar(&appendMode, "a", false, "Append the value instead of replacing it")
 
@@ -84,7 +86,7 @@ func main() {
 			key = fmt.Sprintf("%s?%s", u.Hostname(), strings.Join(pp, "&"))
 		}
 
-		if uniqueMode || !payloadFromFile {
+		if uniqueMode {
 			// Only output each host + path + params combination once.
 			if _, exists := seen[key]; exists {
 				continue
@@ -106,6 +108,31 @@ func main() {
 		os.Exit(1)
 	}
 
+}
+
+func normalizeBoolFlags(args []string) []string {
+	boolFlags := map[string]bool{
+		"-a":            true,
+		"--a":           true,
+		"-ra":           true,
+		"--ra":          true,
+		"-u":            true,
+		"--u":           true,
+		"-ignore-path":  true,
+		"--ignore-path": true,
+	}
+
+	normalized := []string{args[0]}
+	var positional []string
+	for _, arg := range args[1:] {
+		if boolFlags[arg] {
+			normalized = append(normalized, arg)
+			continue
+		}
+		positional = append(positional, arg)
+	}
+
+	return append(normalized, positional...)
 }
 
 func replaceWords(old, new string) {
