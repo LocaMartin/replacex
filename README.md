@@ -1,10 +1,12 @@
+<div align="right">
+  <img src="https://img.shields.io/badge/Go-1.20-00ADD8?style=plastic&logo=go" alt="Go Version">
+</div>
+
 <h1 align="center">replacex</h1>
 
-An enhanced version of qsreplace. replacex accepts URLs via stdin to quickly replace or append query string values while automatically deduplicating unique parameter combinations per host and path. It also features wordlist support and text replacement utilities.
+An enhanced version of `qsreplace`. **replacex** accepts URLs via stdin to quickly replace or append query string values while automatically deduplicating unique parameter combinations per host and path. It also features wordlist support and text replacement utilities.
 
-## Install
-
-With Go:
+### Install
 
 ```
 -$ go install github.com/locamartin/replacex@latest
@@ -13,7 +15,7 @@ With Go:
 Or [download a release](https://github.com/locamartin/replacex/releases) and put it somewhere in your `$PATH`
 (e.g. in /usr/local/bin).
 
-## Usage
+<h3 align="center"><u>Usage</u></h3>
 
 ### Replace Query String Values
 
@@ -34,8 +36,7 @@ https://example.net/a/path?one=1newval&two=2newval
 ```
 
 ### Remove Duplicate URL and Parameter Combinations
-
-You can omit the argument to `-a` to only output each combination of URL and query string parameters once:
+Omit the argument to `-a` (append) to only output each combination of URL and query string parameters once:
 
 ```yml
 -$ cat urls.txt | replacex -a 
