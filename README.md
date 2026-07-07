@@ -4,7 +4,7 @@
   <img src="https://img.shields.io/badge/Go-1.20-00ADD8?style=plastic&logo=go" alt="Go Version">
 </div>
 <h1>replacex</h1>
-<p>v0.1.4</p>
+<p>v0.1.6</p>
 </div>
 
 An enhanced version of `qsreplace`. **replacex** accepts URLs via stdin to quickly replace or append query string values. Payload file mode runs every payload against every input URL. Use `-u` when you want to dedupe input before output. It also features text replacement utilities.

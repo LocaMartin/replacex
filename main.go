@@ -11,7 +11,7 @@ import (
 	"strings"
 )
 
-const version = "v0.1.4"
+const version = "v0.1.6"
 
 func main() {
 	os.Args = normalizeBoolFlags(os.Args)
@@ -128,16 +128,16 @@ func main() {
 
 func printUsage(w io.Writer) {
 	const (
-		reset = "\033[0m"
-		bold  = "\033[1m"
-		cyan  = "\033[36m"
-		green = "\033[32m"
+		reset  = "\033[0m"
+		bold   = "\033[1m"
+		cyan   = "\033[36m"
+		green  = "\033[32m"
 		yellow = "\033[33m"
 	)
 
 	fmt.Fprintf(w, "%sreplacex%s %s%s%s\n\n", bold, reset, green, version, reset)
 	fmt.Fprintf(w, "%sUsage:%s\n", bold, reset)
-	fmt.Fprintf(w, "  %scat%s urls.txt %s|%s %sreplacex%s payload [%sflags%s]\n\n", cyan, reset, cyan, reset, cyan, reset, green, reset,)
+	fmt.Fprintf(w, "  %scat%s urls.txt %s|%s %sreplacex%s payload [%sflags%s]\n\n", cyan, reset, cyan, reset, cyan, reset, green, reset)
 	fmt.Fprintf(w, "%sFlags:%s\n", bold, reset)
 
 	rows := [][2]string{
@@ -170,8 +170,8 @@ func normalizeBoolFlags(args []string) []string {
 		"--ignore-path": true,
 		"-version":      true,
 		"--version":     true,
-		"-h":             true,
-		"--help":          true,
+		"-h":            true,
+		"--help":        true,
 	}
 
 	normalized := []string{args[0]}
