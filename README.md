@@ -9,7 +9,7 @@ An enhanced version of `qsreplace`. **replacex** accepts URLs via stdin to quick
 ### Install
 
 ```
--$ go install github.com/locamartin/replacex@latest
+go install github.com/locamartin/replacex@latest
 ```
 
 Or [download a release](https://github.com/locamartin/replacex/releases) and put it somewhere in your `$PATH`
